@@ -2,6 +2,9 @@ package com.bharath.msa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -21,5 +24,23 @@ public class DemoApplication {
 		
 		SpringApplication.run(DemoApplication.class, args);
 	}
+	 @Bean
+	    public WebMvcConfigurer corsConfigurer() {
+	        // Fetch the allowed origins from the environment variable
+	        String allowedOriginsEnv = System.getenv("ALLOWED_ORIGINS");
+	        String[] allowedOrigins = allowedOriginsEnv != null ? allowedOriginsEnv.split(",") : new String[]{"http://localhost:3000"};
 
+	        return new WebMvcConfigurer() {
+	            @Override
+	            public void addCorsMappings(CorsRegistry registry) {
+	                registry.addMapping("/**") // Apply to all endpoints
+	                        .allowedOrigins(allowedOrigins) // Allow origins from the .env file
+	                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow specific HTTP methods
+	                        .allowedHeaders("*") // Allow all headers
+	                        .allowCredentials(true); // Allow credentials (cookies, etc.)
+	            }
+	        };
+	    }
+	
+   
 }

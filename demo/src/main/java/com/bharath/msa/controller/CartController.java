@@ -20,7 +20,7 @@ import com.bharath.msa.entity.Orders;
 import com.bharath.msa.service.CartServiceImpl;
 
 @RestController
-@CrossOrigin("http://localhost:3000/")
+//@CrossOrigin("http://localhost:3000/")
 public class CartController {
 	@Autowired
 	CartServiceImpl cartServiceImpl;
