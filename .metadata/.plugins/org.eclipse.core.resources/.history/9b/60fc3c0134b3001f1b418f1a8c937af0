@@ -1,0 +1,56 @@
+package com.bharath.msa;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		 Dotenv dotenv = Dotenv.configure()
+		            .filename(".env") // Specify the .env file location
+		            .load();
+
+		        dotenv.entries().forEach(entry ->
+		            System.setProperty(entry.getKey(), entry.getValue())
+		        );
+
+		
+		
+		SpringApplication.run(DemoApplication.class, args);
+	}
+	// CSRF and CORS Configuration
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // Disable CSRF (if necessary)
+            .cors(cors -> {}) // Enable CORS
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll() // Allow all requests
+            );
+
+        return http.build();
+    }
+
+    // CORS Configuration using BASE_URL from the environment
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        String baseUrl = System.getProperty("BASE_URL", "http://localhost:3000"); // Default to localhost if not set
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**") // Match all endpoints
+                        .allowedOrigins(baseUrl) // Allow origin from the .env variable
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Specify allowed methods
+                        .allowedHeaders("*") // Allow all headers
+                        .allowCredentials(true); // Allow cookies or credentials
+            }
+        };
+    }
+
+}
